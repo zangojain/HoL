@@ -1,0 +1,6 @@
+build/*
+.gradle
+.wercker/*
+.DS_STORE
+.vagrant/
+package

@@ -1,0 +1,39 @@
+# This template file will have its environment variables expanded
+# and the .template extension removed by the bash-template Wercker step.
+# See wercker.yml.
+
+# Service Definition
+apiVersion: v1
+kind: Service
+metadata:
+  name: time-api
+  labels:
+    app: time-api
+    commit: ${WERCKER_RUN_ID}
+spec:
+  ports:
+  - port: 8080
+    targetPort: 8080
+    protocol: TCP
+    name: http
+  selector:
+    app: time-api
+    commit: ${WERCKER_RUN_ID}
+---
+# Ingress
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: time-api-ingress
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    ingress.kubernetes.io/ssl-redirect: "true"
+spec:
+  rules:
+  - host: time-api.${WERCKER_APPLICATION_OWNER_NAME}.demo.wercker.com
+    http:
+      paths:
+      - path:
+        backend:
+          serviceName: time-api
+          servicePort: 8080
