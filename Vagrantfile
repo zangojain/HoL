@@ -23,4 +23,6 @@ Vagrant.configure("2") do |config|
   config.vm.box = "debian/contrib-stretch64"
   config.vm.box_version = "9.1.0"
   config.vm.provision "shell", inline: $script, privileged: true
+  config.vm.network :private_network, ip: "172.17.8.200"
+  # config.vm.network "forwarded_port", guest: 8080, host: 8081
 end

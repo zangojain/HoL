@@ -6,7 +6,7 @@ dev:
     - script:
       name: gradle bootRun
       code: |
-        ./gradlew bootRun
+        ./gradlew -t bootRun
 
 # Build Application
 build:
@@ -27,55 +27,3 @@ build:
         code: |
             mv build/libs/time-api-*.jar $WERCKER_OUTPUT_DIR/time-api.jar
             mv *.template $WERCKER_OUTPUT_DIR/
-
-# Push Docker Image
-push-image:
-    steps:
-        - internal/docker-push:
-            cmd: java -jar /pipeline/source/time-api.jar
-            tag: $WERCKER_GIT_BRANCH
-            ports: "8080"
-
-# Deploy to a Kubernetes cluster
-deploy-to-kubernetes:
-    # We only need a minimal shell environment to run Kubectl.
-    box:
-        id: alpine
-        cmd: /bin/sh
-    steps:
-    # https://github.com/wercker/step-bash-template
-    # This Wercker step will look for files in our repo with a .template extension.
-    # It will expand any environment variables in those files, then remove the
-    # template extension.
-    - bash-template
-
-    # The step above should leave us with a Kubernetes service and deployment yml files.
-    # We'll create a directory to move them to.
-    - script:
-        name: Prepare Kubernetes files
-        code: |
-          ls -lth
-          cat kubernetes_*.yml
-          mkdir $WERCKER_OUTPUT_DIR/kubernetes
-          mv kubernetes_*.yml $WERCKER_OUTPUT_DIR/kubernetes
-
-    - kubectl:
-        name: deploy to kubernetes
-        server: $KUBERNETES_MASTER
-        token: $KUBERNETES_TOKEN
-        insecure-skip-tls-verify: true
-        command: apply -f $WERCKER_OUTPUT_DIR/kubernetes/
-
-    - kubectl:
-        name: set deployment timeout
-        server: $KUBERNETES_MASTER
-        token: $KUBERNETES_TOKEN
-        insecure-skip-tls-verify: true
-        command: patch deployment/time-api -p '{"spec":{"progressDeadlineSeconds":60}}'
-
-    - kubectl:
-        name: check deployment status
-        server: $KUBERNETES_MASTER
-        token: $KUBERNETES_TOKEN
-        insecure-skip-tls-verify: true
-        command: rollout status deployment/time-api
