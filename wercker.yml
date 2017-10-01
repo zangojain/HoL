@@ -27,3 +27,14 @@ build:
         code: |
             mv build/libs/time-api-*.jar $WERCKER_OUTPUT_DIR/time-api.jar
             mv *.template $WERCKER_OUTPUT_DIR/
+
+# Push Docker Image
+push-image:
+    steps:
+        - internal/docker-push:
+            cmd: java -jar /pipeline/source/time-api.jar
+            tag: $WERCKER_GIT_BRANCH
+            ports: "8080"
+            username: $DOCKER_USERNAME
+            password: $DOCKER_PASSWORD
+            repository: $DOCKER_REPO
