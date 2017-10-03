@@ -1,7 +1,6 @@
 box: java
 
-# Push Docker Image
- push-image:
+push-image:
      steps:
         - internal/docker-push:
             cmd: java -jar /pipeline/source/time-api.jar
