@@ -1,13 +1,5 @@
 box: java
 
-# Developer.
-dev:
-  steps:
-    - script:
-      name: gradle bootRun
-      code: |
-        ./gradlew -t bootRun
-
 # Build Application
 build:
   steps:
@@ -27,70 +19,3 @@ build:
         code: |
             mv build/libs/time-api-*.jar $WERCKER_OUTPUT_DIR/time-api.jar
             mv *.template $WERCKER_OUTPUT_DIR/
-
-# Push Docker Image
-push-image:
-    steps:
-        - internal/docker-push:
-            cmd: java -jar /pipeline/source/time-api.jar
-            tag: $WERCKER_GIT_BRANCH
-            ports: "8080"
-            username: $DOCKER_USERNAME
-            password: $DOCKER_PASSWORD
-            repository: $DOCKER_REPO
-
-deploy-to-kubernetes:
-    box:
-        id: alpine
-        cmd: /bin/sh
-    steps:
-
-    - bash-template
-
-    - script:
-        name: Prepare Kubernetes files
-        code: |
-          ls -lth
-          cat kubernetes_*.yml
-          mkdir $WERCKER_OUTPUT_DIR/kubernetes
-          mv kubernetes_*.yml $WERCKER_OUTPUT_DIR/kubernetes
-
-    - create-file:
-        name: Create Kubernetes CA
-        filename: ca.crt
-        overwrite: true
-        content: $KUBERNETES_CA
-
-    - create-file:
-        name: Create Kubernetes Client Cert
-        filename: cert.pem
-        overwrite: true
-        content: $KUBERNETES_CLIENT_CERT
-
-    - create-file:
-        name: Create Kubernetes Client Key
-        filename: key.pem
-        overwrite: true
-        content: $KUBERNETES_CLIENT_KEY
-
-    - kubectl:
-        name: deploy to kubernetes
-        server: $KUBERNETES_MASTER
-        certificate-authority: ca.crt
-        client-certificate: cert.pem
-        client-key: key.pem
-        command: apply -f $WERCKER_OUTPUT_DIR/kubernetes/
-
-    - kubectl:
-        name: set deployment timeout
-        certificate-authority: ca.crt
-        client-certificate: cert.pem
-        client-key: key.pem
-        command: patch deployment/time-api -p '{"spec":{"progressDeadlineSeconds":240}}'
-
-    - kubectl:
-        name: check deployment status
-        certificate-authority: ca.crt
-        client-certificate: cert.pem
-        client-key: key.pem
-        command: rollout status deployment/time-api

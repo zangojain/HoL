@@ -26,10 +26,10 @@ You should have familiarity with the above and a basic understanding of the foll
 
 1. Fork the github application in to your own account
 2. Clone the repo to your local laptop
-3. Get VM running with `vagrant up`
+3. Get HoL VM running with `vagrant up`
 4. In a separate terminal window, run `vagrant up` in `kubernetes-vagrant-coreos-cluster`, which will begin the provisioning of your local Kubernetes cluster. You may need to enter your admin password a few times over the next 15 minutes.
-5. Back in the root git repo, run `vagrant ssh` to get inside of the vm, then `sudo su -` to become root, followed by `cd /vagrant` to get to our working directory
-6. Note that we don't have a Java runtime, nor Gradle installed on the VM. All we have is Docker.
+5. Back in the root git repo, run `vagrant ssh` to get inside of the HoL VM, then `sudo su -` to become root, followed by `cd /vagrant` to get to our working directory
+6. Note that we don't have a Java runtime, nor Gradle installed on the HoL VM. All we have is Docker.
 7. run `wercker build` to see if the existing wercker.yml we have will build our application.
 8. It won't. Our tests are failing and we need to edit source code to fix it.
 9. We want to be able to test the source changes we make locally, so lets add a dev pipeline:
@@ -44,10 +44,10 @@ dev:
 ```
 
 10. Fix the source by changing `return null;` to `return this.time;` in `src/main/java/time/Time.java`
-11. Run `wercker dev --publish 8080`. This will come up on your development laptop on 8081 thanks to port forwarding config in the VM.
+11. Run `wercker dev --publish 8080`. This will come up on your development laptop on 8081 thanks to port forwarding config in the HoL VM.
 12. Test that this has come up by hitting `http://localhost:8081/time` on your laptop.
 
-At this point we've got an instance of our application built and run by the Wercker CLI inside of our VM.
+At this point we've got an instance of our application built and run by the Wercker CLI inside of our HoL VM.
 
 13. Run `wercker build` to make sure our unit tests now pass. If they do Gradle will build a jar for the application.
 
@@ -85,7 +85,7 @@ push-image:
 20. Join the build and push docker pipelines in to a Workflow
 21. Trigger your first Wercker Pipeline run by clicking "deploy now"
 22. We now have an image.
-23. Log in to Dockerhub registry from the VM with `docker login`.
+23. Log in to Dockerhub registry from the HoL VM with `docker login`.
 24. Pull the image locally and do a `docker run -p 8080:8080` against it to show that it's come up and accessable
 
 ### Deploy & Operate
@@ -166,7 +166,7 @@ deploy-to-kubernetes:
 
 33. We need to convert the multi-line certificate files in to a single line string for the environment variables, so run `awk '$1=$1' ORS='\\n' < FILE NAME >` for each.
 
-34. Now it's time to define all of our environment variables. Inside the Wercker HoL VM, create a file called `local.env`, and open it in your text editor. Replace the values as noted:
+34. Now it's time to define all of our environment variables. Inside the HoL VM, create a file called `local.env`, and open it in your text editor. Replace the values as noted:
 
 ```
 X_IMAGEPULL_SECRET="wercker-demo"
@@ -226,4 +226,8 @@ Other than any little hacks for the purpose of running your CI/CD flow and deplo
 
 Hopefully this has given you an idea of what it takes to take a Java application from source, through tests and on to a Kubernetes cluster with Wercker, along with the option of running the whole process locally.
 
+If you want to TL;DR your way to a working repo, switch to the "end-state" branch.
+
 Comments, suggestions, and improvements are always welcome! :)
+
+
