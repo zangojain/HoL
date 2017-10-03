@@ -10,8 +10,8 @@ We'll do all of this in a repeatable, automated way using Wercker. Since this is
 
 The Hands on Lab will be run take place inside of a Virtual Machine on a laptop provided by you. Your laptop must have the following installed to take part:
 
-* Virtualbox
-* Vagrant
+* Virtualbox: https://www.virtualbox.org/wiki/Downloads
+* Vagrant: https://www.vagrantup.com/
 
 You should have familiarity with the above and a basic understanding of the following will be beneficial, although is not a hard requirement:
 
