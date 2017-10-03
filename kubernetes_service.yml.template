@@ -14,23 +14,11 @@ spec:
   ports:
   - port: 8080
     targetPort: 8080
+    NodePort: 30297
     protocol: TCP
     name: http
   selector:
     app: time-api
     commit: ${WERCKER_RUN_ID}
+  type: NodePort
 ---
-# Ingress
-apiVersion: extensions/v1beta1
-kind: Ingress
-metadata:
-  name: time-api-ingress
-spec:
-  rules:
-  - host: time-api.demo.wercker.com
-    http:
-      paths:
-      - path:
-        backend:
-          serviceName: time-api
-          servicePort: 8080
